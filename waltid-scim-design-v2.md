@@ -62,11 +62,11 @@ Author: Saurabh Kushwaha
 
 ## 1. What changed since v1
 
-Jake's review (walt.id COO) raised seven points about the SCIM library and three about the DID/VC binding. walt.id has also agreed to review the contribution, handle Enterprise Stack integration, co-maintain the library, and build the Ktor web routes module. I accepted both offers. Jake also noted that the OSS services have no SCIM-style integration today, but the Wallet2 API can host initial development.
+walt.id's review raised seven points about the SCIM library and three about the DID/VC binding. walt.id has also agreed to review the contribution, handle Enterprise Stack integration, co-maintain the library, and build the Ktor web routes module. I accepted both offers. walt.id also noted that the OSS services have no SCIM-style integration today, but the Wallet2 API can host initial development.
 
 The biggest change is the direction of responsibility. In v1 the library handed work down to the host. In v2 the library does the protocol work and the host persists documents.
 
-| # | Jake's point | Decision in v2 | Where |
+| # | walt.id review point | Decision in v2 | Where |
 |---|---|---|---|
 | 1 | Library applies partial updates; large-group membership optional | The library loads, applies all ops atomically, checks mutability, and hands the finished document to the store with the expected version. An optional membership-delta store handles big groups. | §4.1–4.4, §6 |
 | 2 | Every call needs context | `ScimRequestContext` carries tenant, connection, principal, request id, base URI and preconditions. It is passed to every SPI call and event. | §5, §6 |
@@ -170,7 +170,7 @@ The canonical in-memory form is a `ScimDocument`: an immutable wrapper over a ko
 
 | Policy | Behaviour |
 |---|---|
-| `PRESERVE_OPAQUE` (default, lenient mode) | Stored and returned unchanged, so it survives a round trip as Jake asked. Treated with the RFC 7643 §2.2 default characteristics ([RFC 7643 §2.2](https://www.rfc-editor.org/rfc/rfc7643#section-2.2)) |
+| `PRESERVE_OPAQUE` (default, lenient mode) | Stored and returned unchanged, so it survives a round trip as the walt.id review asked. Treated with the RFC 7643 §2.2 default characteristics ([RFC 7643 §2.2](https://www.rfc-editor.org/rfc/rfc7643#section-2.2)) |
 | `DROP` | Silently discarded on input |
 | `REJECT` (RFC and interop-profile modes) | 400 `invalidSyntax` |
 
@@ -253,7 +253,7 @@ The rules:
 
 ### 4.1 Pipeline
 
-This is the core of Jake's first point. The library loads the stored document, applies the request, checks the result, and hands a finished document to the host with the version it read.
+This is the core of the first walt.id review point (§1). The library loads the stored document, applies the request, checks the result, and hands a finished document to the host with the version it read.
 
 ![Figure 7 — PATCH flow: the library loads, applies and checks the change, the host stores it, and the event fires after commit](images/fig06-patch-pipeline.png)
 *Figure 7. PATCH flow: the library loads, applies and checks the change, the host stores it, and the event fires after commit*
@@ -297,7 +297,7 @@ PUT replaces the resource and MUST NOT create one. A PUT to an unknown id return
 
 | Attribute class | Present in the PUT body | Omitted from the PUT body |
 |---|---|---|
-| readWrite | Replaces the stored value | **Cleared**. The RFC allows clearing or defaulting; v2 clears, as Jake asked |
+| readWrite | Replaces the stored value | **Cleared**. The RFC allows clearing or defaulting; v2 clears, as the walt.id review asked |
 | readOnly (`id`, `meta`, `groups`) | Ignored silently (RFC) | Kept |
 | immutable | Must equal the stored value, or 400 `mutability`. Applied if no value is stored yet | Kept |
 | writeOnly (e.g. `password`) | Replaces the stored value; never returned | **Kept (design decision, see below)** |
@@ -732,7 +732,7 @@ id.walt.scim
 ![Figure 13 — Three modes: lenient accepts RFC input plus documented vendor variants, RFC mode accepts exactly what RFC 7644 allows, and the interop profile is a narrower opt-in; output is always standard](images/fig11-compat.png)
 *Figure 13. Three modes: lenient accepts RFC input plus documented vendor variants, RFC mode accepts exactly what RFC 7644 allows, and the interop profile is a narrower opt-in; output is always standard*
 
-Jake's sixth point is that the library is only as valuable as its handling of real clients. Real clients disagree with each other, and with the one serious attempt to tighten the standard. The interop draft rejects path-less PATCH, PUT and unknown attributes. Okta's own clients send path-less deactivation and use PUT for profile updates. Entra's compliant mode sends path-less replaces ([draft-zollner-scim-interop-profile-01](https://www.ietf.org/archive/id/draft-zollner-scim-interop-profile-01.html); [Okta](https://developer.okta.com/docs/api/openapi/okta-scim/guides/scim-20/); [Entra compatibility](https://learn.microsoft.com/en-us/entra/identity/app-provisioning/application-provisioning-config-problem-scim-compatibility)).
+The sixth walt.id review point is that the library is only as valuable as its handling of real clients. Real clients disagree with each other, and with the one serious attempt to tighten the standard. The interop draft rejects path-less PATCH, PUT and unknown attributes. Okta's own clients send path-less deactivation and use PUT for profile updates. Entra's compliant mode sends path-less replaces ([draft-zollner-scim-interop-profile-01](https://www.ietf.org/archive/id/draft-zollner-scim-interop-profile-01.html); [Okta](https://developer.okta.com/docs/api/openapi/okta-scim/guides/scim-20/); [Entra compatibility](https://learn.microsoft.com/en-us/entra/identity/app-provisioning/application-provisioning-config-problem-scim-compatibility)).
 
 - **Lenient (default).** Everything RFC 7644 allows, plus the documented vendor variants below. Output is always standard SCIM. Tolerance applies to input only.
 - **RFC.** Exactly what RFC 7643 and RFC 7644 allow, with no coercion. This includes path-less `add` and `replace`, which RFC 7644 §3.5.2.3 defines: with no `path`, the target is the resource itself ([RFC 7644 §3.5.2.3](https://www.rfc-editor.org/rfc/rfc7644#section-3.5.2.3)). Vendor-only shapes, such as dotted keys inside a path-less value or string booleans, are rejected with the RFC error. This is the conformance target, and the name is meant literally: it never rejects a request the RFC permits.
@@ -785,7 +785,7 @@ Capitalised sub-attribute names, such as Entra's `emails[type eq "other"].Value`
 
 ### 10.1 Events
 
-Jake asked for a small callback that fires after a successful deactivate, reactivate, delete or membership change. The library derives events from the before/after diff of a committed write:
+The walt.id review asked for a small callback that fires after a successful deactivate, reactivate, delete or membership change. The library derives events from the before/after diff of a committed write:
 
 | Event | Derived from | RFC 9967 name |
 |---|---|---|
@@ -854,15 +854,15 @@ How the host meets the existing-access guarantee depends on where sessions live:
 
 v2.1 had revoked first and committed second, relying on the client's retry to finish the job after a failure. The reviewer was right that this is fragile. A connection can be deleted, or a client can stop retrying, before the retry ever comes. The durable intent removes that dependency, so recovery is the host's responsibility and no longer the client's.
 
-This keeps Jake's point 7 intact. The library still knows nothing about sessions, and the post-commit listener still cannot fail a request. Revocation belongs to the host's store and its reconciler, and the library supplies the pending events that make the intent row easy to write.
+This keeps walt.id review point 7 intact. The library still knows nothing about sessions, and the post-commit listener still cannot fail a request. Revocation belongs to the host's store and its reconciler, and the library supplies the pending events that make the intent row easy to write.
 
 ---
 
 ## 11. Credential lifecycle binding
 
-v1 called this "DID/VC binding". Jake's three points change it enough to need a new name. The question is no longer "which DID does this account map to?" It is "when the directory says this account changed, which issued credentials must change status?"
+v1 called this "DID/VC binding". The walt.id review's three credential points change it enough to need a new name. The question is no longer "which DID does this account map to?" It is "when the directory says this account changed, which issued credentials must change status?"
 
-### 11.1 x509-first (Jake's point B1)
+### 11.1 x509-first (walt.id review point B1)
 
 The regulated, high-assurance ecosystems are X.509-anchored, and the specs walt.id customers are implementing say so directly:
 
@@ -873,7 +873,7 @@ The regulated, high-assurance ecosystems are X.509-anchored, and the specs walt.
 
 The evidence supports "regulated ecosystems standardised on X.509". It does not quantify any decline in DID use, and DIDs remain in EBSI-style tracks. So the module's issuer configuration holds certificate chains and trust anchors. walt.id already has the X.509 service profiles for IACA, DS and ETSI providers ([walt.id X.509 service](https://docs.walt.id/enterprise-stack/services/x509-service/issue-certificates.md)). DID-based issuers are an optional later extension.
 
-### 11.2 Bind to issued credential instances, not holder keys (Jake's point B2)
+### 11.2 Bind to issued credential instances, not holder keys (walt.id review point B2)
 
 ![Figure 16 — From one stable holder key to per-credential status entries](images/fig13-credential-binding.png)
 *Figure 16. From one stable holder key to per-credential status entries*
@@ -897,12 +897,12 @@ data class IssuedCredentialRecord(
 
 It stores no holder public key, no `cnf` thumbprint and no holder DID. Revocation does not need them, and ARF Topic A argues against keeping them. If a stable holder identity is genuinely needed, the ARF route is the wallet unit attestation and its status, not a key on the credential.
 
-### 11.3 Status is per credential; claim changes mean revoke and reissue (Jake's point B3)
+### 11.3 Status is per credential; claim changes mean revoke and reissue (walt.id review point B3)
 
 ![Figure 17 — Default credential status transitions under the issuer policy: reactivation clears only suspensions the SCIM deactivation caused (author proposal, not from a spec)](images/fig14-status-states.png)
 *Figure 17. Default credential status transitions under the issuer policy: reactivation clears only suspensions the SCIM deactivation caused (author proposal, not from a spec)*
 
-Jake is right, and v2 drops partial revocation. The IETF Token Status List represents exactly one status per referenced token, with 0x00 VALID, 0x01 INVALID and 0x02 SUSPENDED in 2-bit lists ([draft-ietf-oauth-status-list-21](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-21.txt)). As of 3 November 2026 it is IESG-approved and in the RFC Editor queue (first edit), still an Internet-Draft with no RFC number. W3C Bitstring Status List v1.0 (Recommendation, May 2025) applies status to the whole credential through `revocation` (irreversible) and `suspension` (reversible) purposes ([W3C](https://www.w3.org/TR/vc-status-list/)). mdoc revocation in the 18013-5 second edition profiles Token Status List, but that edition was still at DIS stage in the ISO catalogue ([ISO 91081](https://www.iso.org/fr/standard/91081.html); [MATTR](https://learn.mattr.global/docs/issuance/token-status-list-feature-support)).
+The review is right, and v2 drops partial revocation. The IETF Token Status List represents exactly one status per referenced token, with 0x00 VALID, 0x01 INVALID and 0x02 SUSPENDED in 2-bit lists ([draft-ietf-oauth-status-list-21](https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-21.txt)). As of 3 November 2026 it is IESG-approved and in the RFC Editor queue (first edit), still an Internet-Draft with no RFC number. W3C Bitstring Status List v1.0 (Recommendation, May 2025) applies status to the whole credential through `revocation` (irreversible) and `suspension` (reversible) purposes ([W3C](https://www.w3.org/TR/vc-status-list/)). mdoc revocation in the 18013-5 second edition profiles Token Status List, but that edition was still at DIS stage in the ISO catalogue ([ISO 91081](https://www.iso.org/fr/standard/91081.html); [MATTR](https://learn.mattr.global/docs/issuance/token-status-list-feature-support)).
 
 **The mapping is an issuer policy, not a fixed table.** The SCIM library reports what happened to the account. Whether a credential changes status is the issuer's decision, made by a `CredentialLifecyclePolicy` that sees the SCIM event, the credential type, the issuing authority, the credential's current status and the *reason* for that status. Neither status-list standard carries a reason, so the issuance registry stores one per credential (for example `SCIM_DEACTIVATION`, `FRAUD`, `ISSUER_DECISION`).
 
@@ -995,13 +995,13 @@ Phase 1 keeps its full scope but lands as four PRs, each reviewable on its own. 
 
 | Increment | Scope | Owner | Accepted when |
 |---|---|---|---|
-| **PR 1 — User core** | `ScimDocument` with `UnknownAttributePolicy`, schema registry (User, Enterprise User), validation, filter parser and in-memory evaluator, store SPI with context, permissions, `ProvisioningScope` check and `revision`, PUT, the PATCH subset clients send for users (path-less replace, `active`, simple paths), `meta`, errors, index paging, capability profile and discovery builders, in-memory store, store contract kit | Saurabh | Create, read, filter (`userName eq`, `externalId eq`), PUT, deactivate, reactivate and delete pass against the in-memory store. Contract kit green for isolation, correlation and rollback |
+| **PR 1 — User core** | `ScimDocument` with `UnknownAttributePolicy`, schema registry (User, Enterprise User), validation, filter parser and in-memory evaluator, store SPI with context, permissions, `ProvisioningScope` check and `revision`, PUT, the PATCH subset clients send for users (path-less replace, `active`, simple paths), `meta`, errors, index paging, capability profile and discovery builders, in-memory store, store contract kit | Author | Create, read, filter (`userName eq`, `externalId eq`), PUT, deactivate, reactivate and delete pass against the in-memory store. Contract kit green for isolation, correlation and rollback |
 | **PR 2 — Routes** | `waltid-scim-server`: Ktor routes for Users and discovery, context resolver, static-bearer and OAuth client-credentials authenticators, wire format (§7.6), limits (§7.7) | walt.id | Ktor test-host suite green for core HTTP and RFC behaviour (status codes, headers, wire format, auth, limits). Vendor validators wait for PR 4 |
-| **PR 3 — Full PATCH and Groups** | Every §4.2 case, Groups, membership store and §4.6 rules, concurrency retry (§4.5), lifecycle events and the enforcement ordering (§10) | Saurabh (core), walt.id (Group routes) | Every §4.2, §4.6 and §4.7 row has a test. Rollback, parallel-PATCH, non-commuting membership, event-after-commit and revocation-intent tests green |
-| **PR 4 — Vendor compatibility** | Compatibility layer (§9), lenient, RFC and interop-profile modes, fixture corpus | Saurabh | Every §9.2 rule replays in all three modes. The Entra SCIM Validator and Okta Runscope suites pass against the in-memory store |
-| **PR 5 — Real host (Phase 2)** | Wallet2 API store adapter; live Entra (both PATCH modes) and Okta runs | Saurabh, with walt.id | Contract kit passes on the Wallet2 adapter, and the full lifecycle works on live tenants. Only now is the design called validated |
+| **PR 3 — Full PATCH and Groups** | Every §4.2 case, Groups, membership store and §4.6 rules, concurrency retry (§4.5), lifecycle events and the enforcement ordering (§10) | Author (core), walt.id (Group routes) | Every §4.2, §4.6 and §4.7 row has a test. Rollback, parallel-PATCH, non-commuting membership, event-after-commit and revocation-intent tests green |
+| **PR 4 — Vendor compatibility** | Compatibility layer (§9), lenient, RFC and interop-profile modes, fixture corpus | Author | Every §9.2 rule replays in all three modes. The Entra SCIM Validator and Okta Runscope suites pass against the in-memory store |
+| **PR 5 — Real host (Phase 2)** | Wallet2 API store adapter; live Entra (both PATCH modes) and Okta runs | Author, with walt.id | Contract kit passes on the Wallet2 adapter, and the full lifecycle works on live tenants. Only now is the design called validated |
 | **Enterprise Stack (Phase 2)** | Integration with the Enterprise Stack | walt.id | walt.id's acceptance |
-| **Phase 3 — Credential lifecycle (optional)** | `waltid-scim-credential-lifecycle`: issuance registry, random index allocation, event → status mapper, x5c-signed Status List Tokens (JWT and CWT), short-lived credential mode. x509 first; DID issuers only if demand appears | Saurabh + walt.id | Scope agreed after Phase 2 |
+| **Phase 3 — Credential lifecycle (optional)** | `waltid-scim-credential-lifecycle`: issuance registry, random index allocation, event → status mapper, x5c-signed Status List Tokens (JWT and CWT), short-lived credential mode. x509 first; DID issuers only if demand appears | Author + walt.id | Scope agreed after Phase 2 |
 | **Later, if needed** | RFC 9865 cursor paging, `/Bulk`, RFC 9967 SET emitter, `/GroupMembers`, RFC 9944 device schemas, nested groups | — | Demand-driven |
 
 Phase 1 should be usable as a generic SCIM library with no walt.id-specific code. Phase 2 proves the abstraction against a real walt.id service.

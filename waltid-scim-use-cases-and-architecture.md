@@ -4,7 +4,7 @@
 
 > **Superseded.** This is v1, kept for history. The current design is [v2.2](waltid-scim-design-v2.md).
 
-This document answers the two questions Phil raised: what the library should cover, and how it should be shaped.
+This document answers the two questions walt.id raised: what the library should cover, and how it should be shaped.
 
 The proposal is intentionally narrow: add a clean SCIM 2.0 foundation that lets standards-compliant enterprise provisioning clients such as Microsoft Entra ID, Okta, Ping, or an IGA platform provision and deprovision walt.id resources. The same library should also be usable by implementors outside walt.id.
 

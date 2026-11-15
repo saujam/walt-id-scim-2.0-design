@@ -1,14 +1,14 @@
 flowchart LR
   subgraph P1["Phase 1 — generic library, four PRs"]
     direction LR
-    PR1["<b>PR 1 · User core</b><br/>store SPI · context · isolation<br/>discovery · contract test kit<br/><i>Saurabh</i>"]:::lib
-    PR2["<b>PR 2 · Routes</b><br/>Ktor · auth · wire format<br/>Entra validator, user tests<br/><i>walt.id</i>"]:::walt
-    PR3["<b>PR 3 · PATCH + Groups</b><br/>membership rules · concurrency<br/>events · enforcement order<br/><i>Saurabh + walt.id</i>"]:::lib
-    PR4["<b>PR 4 · Vendor quirks</b><br/>lenient / strict modes<br/>fixture corpus<br/><i>Saurabh</i>"]:::lib
+    PR1["<b>PR 1 · User core</b><br/>store SPI · context · isolation<br/>discovery · contract test kit<br/><i>author</i>"]:::lib
+    PR2["<b>PR 2 · Routes</b><br/>Ktor · auth · wire format<br/>core HTTP + RFC tests<br/><i>walt.id</i>"]:::walt
+    PR3["<b>PR 3 · PATCH + Groups</b><br/>membership rules · concurrency<br/>events · enforcement order<br/><i>author + walt.id</i>"]:::lib
+    PR4["<b>PR 4 · Vendor quirks</b><br/>lenient · RFC · interop modes<br/>fixtures · Entra + Okta suites<br/><i>author</i>"]:::lib
   end
   subgraph P2["Phase 2 — proven on a real host"]
     direction TB
-    PR5["<b>PR 5 · Wallet2 adapter</b><br/>live Entra + Okta<br/>contract kit on a real store<br/><i>Saurabh</i>"]:::lib
+    PR5["<b>PR 5 · Wallet2 adapter</b><br/>live Entra + Okta<br/>contract kit on a real store<br/><i>author</i>"]:::lib
     ENT["<b>Enterprise Stack</b><br/>integration<br/><i>walt.id</i>"]:::walt
   end
   P3["<b>Phase 3 · optional</b><br/>credential lifecycle<br/>x509-first"]:::opt
