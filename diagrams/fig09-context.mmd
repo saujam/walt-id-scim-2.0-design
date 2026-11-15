@@ -1,0 +1,15 @@
+flowchart LR
+  R["https://host/scim/v2/{connectionId}/Users"]:::ext --> P["Resolve tenant and<br/>connection from the path"]:::walt
+  P --> A{"Credential bound to<br/>this connection?"}
+  A -->|"no, or unknown connection"| X["401<br/>(never reveals other tenants)"]:::bad
+  A -->|yes| CTX["<b>ScimRequestContext</b><br/>tenant · connection · principal<br/>requestId · baseUri<br/>preconditions · compat profile"]:::lib
+  CTX --> SPI["Every store call"]:::ext
+  CTX --> EV["Every lifecycle event"]:::ext
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

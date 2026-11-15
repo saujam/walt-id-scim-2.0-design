@@ -1,0 +1,18 @@
+flowchart LR
+  subgraph v1["v1 — each service did the hard parts"]
+    direction TB
+    a1["Library<br/>parse request, route it"]:::ext --> a2["Every service<br/>interprets raw PATCH ops<br/>fixed User / Group classes<br/>own meta, errors, quirks"]:::bad
+  end
+  subgraph v2["v2 — the library owns the protocol"]
+    direction TB
+    b1["Library<br/>normalise vendor quirks<br/>apply PATCH / PUT<br/>enforce schema, set meta<br/>errors, discovery, events"]:::lib --> b2["Service<br/>assign id, store document<br/>react to lifecycle events"]:::good
+  end
+  v1 ==>|"Jake's review"| v2
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

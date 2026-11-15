@@ -1,0 +1,20 @@
+flowchart LR
+  IdP["Enterprise IdP<br/>(Entra, Okta, …)"]:::ext
+  subgraph walt["walt.id"]
+    direction TB
+    B["<b>OIDC Bridge / VC presentation</b><br/>How does an active account<br/>prove who it is?"]:::ext
+    SC["<b>SCIM library</b><br/>Should the account exist, is it active,<br/>which attributes and groups?"]:::lib
+    A[("Account state")]:::ext
+  end
+  IdP -->|"login / presentation"| B
+  IdP -->|"provisioning"| SC
+  B --> A
+  SC --> A
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

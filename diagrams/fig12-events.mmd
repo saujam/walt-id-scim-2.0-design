@@ -1,0 +1,16 @@
+flowchart LR
+  W["Host store commits<br/>the write"]:::ext --> D["Library diffs<br/>before / after"]:::lib
+  D --> EV["Created · Activated · Deactivated<br/>Deleted · MembershipChanged · Updated<br/>(RFC 9967 names)"]:::lib
+  EV --> PC["Post-commit listener<br/>at-most-once · errors logged<br/>never fails the SCIM response"]:::lib
+  W -.->|"optional, same transaction"| OB[("Outbox rows")]:::opt
+  OB -.-> RL["Relay · at-least-once<br/>dedupe on eventId"]:::opt
+  PC --> CONS["Host actions<br/>sessions · API keys<br/>credentials · SSF / CAEP"]:::ext
+  RL -.-> CONS
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

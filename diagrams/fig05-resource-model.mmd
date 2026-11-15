@@ -1,0 +1,16 @@
+flowchart LR
+  J["Incoming JSON<br/>any casing · URN extensions<br/>unknown attributes"]:::ext --> N["Key normalisation<br/>known → canonical spelling<br/>unknown → kept verbatim"]:::lib
+  N --> D["<b>ScimDocument</b><br/>immutable JSON tree<br/>case-insensitive lookup"]:::lib
+  R["<b>ScimSchemaRegistry</b><br/>User · Group · Enterprise User<br/>+ host extensions"]:::lib
+  R -->|"types · mutability<br/>returned · caseExact"| D
+  R --> DISC["/Schemas · /ResourceTypes<br/>/ServiceProviderConfig"]:::lib
+  D --> V["Typed views<br/>ScimUserView · ScimGroupView"]:::lib
+  D --> OUT["Response JSON<br/>returned + attributes projection"]:::ext
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

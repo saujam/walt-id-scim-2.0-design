@@ -1,0 +1,20 @@
+flowchart LR
+  ENT["Enterprise Stack integration<br/>(walt.id)"]:::walt
+  W2["Wallet2 API adapter<br/>(Phase 2)"]:::lib
+  CL["<b>waltid-scim-credential-lifecycle</b><br/>credentials/ · Phase 3, optional"]:::opt
+  SRV["<b>waltid-scim-server</b><br/>protocols/ · JVM · Ktor routes<br/>built by walt.id"]:::walt
+  SCIM["<b>waltid-scim</b><br/>protocols/ · Kotlin Multiplatform<br/>no server dependencies"]:::lib
+  SL["waltid-status-list<br/>credentials/ · existing codecs"]:::ext
+  COMMONS["waltid-library-commons<br/>(existing)"]:::ext
+  ENT --> SRV
+  SRV --> SCIM
+  W2 --> SCIM
+  CL --> SCIM
+  CL --> SL
+  SCIM --> COMMONS
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;

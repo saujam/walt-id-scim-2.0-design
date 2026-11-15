@@ -1,0 +1,28 @@
+flowchart LR
+  subgraph sent["What clients actually send"]
+    direction TB
+    E1["<b>Entra (default)</b><br/>op: Replace · active: 'False'<br/>remove members with a value list"]:::ext
+    E2["<b>Entra (aadOptscim062020)</b><br/>path-less replace<br/>with dotted / URN keys"]:::ext
+    O1["<b>Okta</b><br/>PUT with the full user<br/>path-less active:false<br/>id inside a group rename"]:::ext
+    X1["<b>Others</b><br/>manager shapes · content types<br/>OneLogin group PATCH"]:::ext
+  end
+  CP{"Connection's<br/>compat profile"}
+  E1 --> CP
+  E2 --> CP
+  O1 --> CP
+  X1 --> CP
+  CP -->|"lenient (default)"| NORM["<b>Lenient</b><br/>all RFC input, plus vendor variants<br/>normalised by 19 rules with fixtures"]:::lib
+  CP -->|RFC| RFC["<b>RFC mode</b><br/>exactly what RFC 7644 allows<br/>incl. path-less add / replace<br/>vendor-only shapes → RFC error"]:::lib
+  CP -.->|"opt-in"| IOP["<b>Interop profile</b><br/>narrower draft rules<br/>e.g. no path-less PATCH"]:::opt
+  NORM --> ENG["PATCH / PUT engine"]:::lib
+  RFC --> ENG
+  IOP -.-> ENG
+  ENG --> OUT["Always standard<br/>SCIM output"]:::good
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

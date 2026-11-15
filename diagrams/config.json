@@ -1,0 +1,33 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Helvetica, Arial, sans-serif",
+    "fontSize": "15px",
+    "primaryColor": "#EEF3FC",
+    "primaryBorderColor": "#3B6FD8",
+    "primaryTextColor": "#1B2533",
+    "lineColor": "#5B6B80",
+    "secondaryColor": "#F4F6F8",
+    "tertiaryColor": "#FFFFFF",
+    "clusterBkg": "#FAFBFC",
+    "clusterBorder": "#C9D2DE",
+    "edgeLabelBackground": "#FFFFFF",
+    "actorBkg": "#EEF3FC",
+    "actorBorder": "#3B6FD8",
+    "noteBkgColor": "#FFF7E0",
+    "noteBorderColor": "#D9B44A"
+  },
+  "flowchart": {
+    "curve": "basis",
+    "padding": 14,
+    "nodeSpacing": 40,
+    "rankSpacing": 55,
+    "htmlLabels": true,
+    "wrappingWidth": 600
+  },
+  "sequence": {
+    "mirrorActors": false,
+    "actorMargin": 40
+  },
+  "themeCSS": ".nodeLabel, .edgeLabel, .label div, foreignObject div { white-space: nowrap !important; max-width: none !important; } .cluster-label .nodeLabel { font-weight: 600; }"
+}

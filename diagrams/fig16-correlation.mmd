@@ -1,0 +1,18 @@
+flowchart TB
+  subgraph trap["Trap: visibility per connection, uniqueness per tenant"]
+    direction LR
+    t1["Connection B searches<br/>userName eq ana"]:::ext --> t2["0 results<br/>(Ana belongs to A)"]:::ext --> t3["Connection B<br/>creates Ana"]:::ext --> t4["409 uniqueness<br/>for a user B cannot see"]:::bad --> t5["User quarantined<br/>no way to fix from B"]:::bad
+  end
+  subgraph rule["Rule: one provisioning domain for both"]
+    direction LR
+    r0{"Domain model"}
+    r0 -->|per connection| r1["B creates its own Ana<br/>A's Ana untouched"]:::good
+    r0 -->|per tenant| r2["B's search finds Ana<br/>client links it itself"]:::good
+  end
+  trap ~~~ rule
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;

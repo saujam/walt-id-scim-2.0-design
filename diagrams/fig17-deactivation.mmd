@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant C as Entra / Okta
+    participant L as SCIM library
+    participant S as Host store
+    participant A as Session service
+    participant R as Reconciler
+    C->>L: PATCH active=false
+    L->>S: replace(doc, expected v7, events=[Deactivated])
+    Note over S: one transaction:<br/>active=false + revocation intent
+    Note over S: new sign-ins fail from here<br/>(auth reads this store)
+    S->>A: inline attempt: revoke sessions, tokens, API keys
+    alt revocation succeeds
+        A-->>S: done
+        S->>S: mark intent complete
+    else fails or times out
+        A-->>S: error
+        Note over S: intent stays pending
+    end
+    S-->>L: committed (v8, revision 42)
+    L-->>C: 200 / 204
+    Note over R,A: later, independent of any client retry,<br/>including after a crash
+    R->>A: revoke for each pending intent (idempotent)
+    A-->>R: done
+    R->>S: mark intent complete

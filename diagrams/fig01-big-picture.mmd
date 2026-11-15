@@ -1,0 +1,31 @@
+flowchart TB
+  CL["<b>Enterprise directories</b><br/>Microsoft Entra ID · Okta · IGA platforms"]:::ext
+  subgraph lib[" "]
+    direction LR
+    S["<b>waltid-scim-server</b> (open source)<br/>Ktor routes · auth<br/>tenant + connection resolution"]:::walt
+    C["<b>waltid-scim</b> (open source)<br/>schemas · filter parser<br/>PATCH / PUT engine<br/>vendor quirks · errors · discovery"]:::lib
+  end
+  subgraph host["walt.id product (host)"]
+    direction LR
+    ST[("Account store<br/>Wallet2 API / Enterprise Stack")]:::ext
+    L["Lifecycle handler"]:::ext
+  end
+  subgraph fx["What the host does next"]
+    direction LR
+    SE["End sessions<br/>disable API keys"]:::ext
+    CR["Suspend / revoke<br/>issued credentials<br/>(Phase 3)"]:::opt
+  end
+  CL ==>|"SCIM 2.0 over HTTPS"| S
+  S --> C
+  C -->|"finished document<br/>+ expected version"| ST
+  C -.->|"event, after commit"| L
+  L --> SE
+  L -.-> CR
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

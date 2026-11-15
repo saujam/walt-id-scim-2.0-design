@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant C as Entra / Okta
+    participant R as waltid-scim-server
+    participant L as waltid-scim engine
+    participant S as Host store
+    participant H as Lifecycle listener
+    C->>R: PATCH /Users/{id}
+    R->>L: request + ScimRequestContext
+    Note over L: normalise vendor quirks
+    L->>S: get(ctx, User, id)
+    S-->>L: document + version v1
+    Note over L: If-Match sent and stale? → 412
+    Note over L: apply ops on a copy<br/>enforce mutability, diff
+    alt nothing changed
+        L-->>R: 200 / 204, no event
+    else changed
+        L->>S: replace(newDoc, expected = v1)
+        opt conflict, no If-Match
+            L->>S: reload, re-apply, retry (max 3)
+        end
+        S-->>L: committed, version v2
+        L-->>R: 200 + resource, ETag W/"v2"
+        L-)H: onCommitted(event)
+    end
+    R-->>C: response

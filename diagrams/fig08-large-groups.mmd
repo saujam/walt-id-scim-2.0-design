@@ -1,0 +1,16 @@
+flowchart LR
+  P["PATCH /Groups/{id}<br/>add members · remove members<br/>replace displayName"]:::ext --> S{"Host implements<br/>ScimMembershipStore?"}
+  S -->|"no (small groups)"| DOC["Load whole group<br/>apply all ops, replace"]:::lib
+  S -->|yes| SPLIT["Split the ops"]:::lib
+  SPLIT --> M["Membership deltas<br/>Add · Remove · ReplaceAll"]:::lib --> MS[("Membership rows")]:::ext
+  SPLIT --> G["Other ops on the group<br/>loaded without members"]:::lib --> GS[("Group document")]:::ext
+  MS --> T["One transaction<br/>returns the effective delta"]:::good
+  GS --> T
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+

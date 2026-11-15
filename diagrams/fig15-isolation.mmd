@@ -1,0 +1,16 @@
+flowchart LR
+  REQ["PATCH /scim/v2/conn-B/Users/u-17"]:::ext --> CTX["<b>Context</b><br/>tenant T · connection B<br/>scope (T, B) · permissions"]:::walt
+  CTX --> PERM{"Permission for<br/>User UPDATE?"}
+  PERM -->|no| X403["403<br/>nothing read"]:::bad
+  PERM -->|yes| STORE["<b>Store</b><br/>get u-17 within scope (T, B)<br/>tenant and domain together"]:::ext
+  STORE --> VIS{"u-17 in<br/>scope (T, B)?"}
+  VIS -->|no| X404["404<br/>same answer as a missing id"]:::bad
+  VIS -->|yes| GUARD{"Library check:<br/>returned scope = (T, B)?"}
+  GUARD -->|no| X500["500, fail closed<br/>store bug logged"]:::bad
+  GUARD -->|yes| OK["Apply PATCH<br/>write in scope (T, B)"]:::good
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;

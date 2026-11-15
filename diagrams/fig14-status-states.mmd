@@ -1,0 +1,18 @@
+stateDiagram-v2
+  direction LR
+  state "VALID" as V
+  state "SUSPENDED<br/>reason: SCIM deactivation" as SS
+  state "SUSPENDED<br/>other reason (fraud, issuer)" as SO
+  state "INVALID" as I
+  [*] --> V: issued
+  V --> SS: deactivate (type follows account)
+  SS --> V: reactivate
+  V --> SO: issuer decision
+  SO --> I: issuer decision
+  V --> I: delete or dependent claim change<br/>(per type policy)
+  SS --> I: delete (per type policy)
+  I --> [*]
+  note right of SO
+    reactivation never
+    clears this state
+  end note

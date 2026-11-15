@@ -1,0 +1,21 @@
+flowchart LR
+  A["PATCH or PUT arrives"]:::ext --> B{"Client sent<br/>If-Match?"}
+  B -->|yes| C{"Matches the<br/>stored version?"}
+  C -->|no| X1["412 Precondition Failed"]:::bad
+  C -->|yes| D
+  B -->|"no (Entra, Okta)"| D["Apply ops to a copy<br/>write with expectedVersion"]:::lib
+  D --> E{"Store reports<br/>a conflict?"}
+  E -->|no| OK["200 / 204 + new ETag"]:::good
+  E -->|yes| F{"If-Match<br/>was sent?"}
+  F -->|yes| X1
+  F -->|no| G{"Fewer than<br/>3 attempts?"}
+  G -->|yes| H["Reload, re-apply<br/>the same ops"]:::lib --> D
+  G -->|no| X2["503 + Retry-After"]:::bad
+
+classDef lib fill:#EEF3FC,stroke:#3B6FD8,stroke-width:1.5px,color:#1B2533;
+classDef walt fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+classDef ext fill:#F4F6F8,stroke:#8796A8,stroke-width:1.2px,color:#1B2533;
+classDef opt fill:#FFFFFF,stroke:#8796A8,stroke-width:1.2px,stroke-dasharray:5 4,color:#4A5868;
+classDef bad fill:#FDEDEC,stroke:#C0392B,stroke-width:1.5px,color:#1B2533;
+classDef good fill:#E9F6EE,stroke:#2E9B5F,stroke-width:1.5px,color:#1B2533;
+
